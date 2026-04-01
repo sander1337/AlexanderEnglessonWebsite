@@ -532,353 +532,525 @@
       <div class="hud-hero-overlay"><div><div class="p-tag">Specialisation</div><h1>In-Game UI Editor</h1></div></div>
     </div>
 
-    <div class="p-body">
-      <div class="hud-stats">
-        <div class="hud-stat"><span class="hud-stat-val">10+</span><span class="hud-stat-label">Draggable Frames</span></div>
-        <div class="hud-stat"><span class="hud-stat-val">C++</span><span class="hud-stat-label">Language</span></div>
-        <div class="hud-stat"><span class="hud-stat-val">TGE</span><span class="hud-stat-label">Engine</span></div>
-        <div class="hud-stat"><span class="hud-stat-val">Live</span><span class="hud-stat-label">Edit Mode</span></div>
-        <div class="hud-stat"><span class="hud-stat-val">2026</span><span class="hud-stat-label">Year</span></div>
-      </div>
+   <div class="p-body">
 
-      <div class="p-section">
-        <h2>Overview</h2>
-        <p>I built a fully custom, player-configurable HUD system from scratch in C++ using the schools custom game engine (TGE). The system allows players to enter an edit mode and freely drag, resize, and toggle every UI element — player frame, target frame, party frames, buff/debuff frames, action bars, cast bar, and stance bar. Inspired by World of Warcraft's addon system, every frame is a movable object with real-time snap-to-grid and snap-to-element behaviour.</p>
-      </div>
+  <!-- ── STATS BAR ─────────────────────────────────────────────────── -->
+  <div class="tools-stats">
+    <div class="tools-stat">
+      <span class="tools-stat-val">7</span>
+      <span class="tools-stat-label">Spawn Shapes</span>
+    </div>
+    <div class="tools-stat">
+      <span class="tools-stat-val">9</span>
+      <span class="tools-stat-label">Over-Lifetime Curves</span>
+    </div>
+    <div class="tools-stat">
+      <span class="tools-stat-val">Sub-Emitters</span>
+      <span class="tools-stat-label">Nested Architecture</span>
+    </div>
+    <div class="tools-stat">
+      <span class="tools-stat-val">PhysX</span>
+      <span class="tools-stat-label">Particle Collision</span>
+    </div>
+    <div class="tools-stat">
+      <span class="tools-stat-val">Live</span>
+      <span class="tools-stat-label">Shape Debug Overlay</span>
+    </div>
+    <div class="tools-stat">
+      <span class="tools-stat-val">C++</span>
+      <span class="tools-stat-label">ImGui / TGE</span>
+    </div>
+  </div>
 
-      <div class="p-section">
-        <h2>My Role &amp; Responsibilities</h2>
-        <p>I designed and implemented the entire HUD system solo — from the base Button/Frame architecture and drag-drop system, through to every individual UI widget. I built the edit mode panel with its checkbox settings, grid slider, and advanced options toggle. I also implemented the spellbook, action bar per-slot settings popups, party frame configuration, and the spell tooltip system.</p>
-        <div class="p-chips">
-          <span class="chip">HUD / UI Systems</span><span class="chip">Drag &amp; Drop</span><span class="chip">Edit Mode</span>
-          <span class="chip">Action Bars</span><span class="chip">Buff / Debuff System</span><span class="chip">Cast Bar</span>
-          <span class="chip">Party Frames</span><span class="chip">Spell Tooltip</span><span class="chip">C++</span><span class="chip">Custom Engine (TGE)</span>
+  <!-- ── OVERVIEW ──────────────────────────────────────────────────── -->
+  <div class="p-section">
+    <h2>Overview</h2>
+    <p>
+      I built a fully custom particle and VFX editor in C++ inside our team's engine (TGE), designed for real production use alongside artists and designers. The system supports seven spawn shapes, nine over-lifetime curves (size, velocity XYZ, colour RGBA, rotation), a sub-emitter architecture, a configurable burst system, PhysX world collision with decal spawning, and a warmup system for pre-simulating effects before the scene starts. Every property round-trips through a JSON serialisation layer, and the editor renders live per-shape wireframe debug overlays directly into the viewport so emitter bounds are always visible while tuning.
+    </p>
+  </div>
+
+  <!-- ── ROLE ──────────────────────────────────────────────────────── -->
+  <div class="p-section">
+    <h2>My Role &amp; Responsibilities</h2>
+    <p>
+      I designed and built the full system solo — the data architecture, the ImGui editor UI, the JSON serialisation layer, the runtime particle update loop, the PhysX collision integration, and the shader integration. I also wrote the <code style="font-family:'Share Tech Mono',monospace;font-size:0.9em;color:var(--accent);">DrawShapeDebug</code> static function that renders shape-accurate wireframes into the editor viewport, and a custom Rodrigues rotation implementation to orient all spawn shapes to an arbitrary axis without gimbal lock.
+    </p>
+    <div class="p-chips">
+      <span class="chip">C++</span>
+      <span class="chip">ImGui Editor</span>
+      <span class="chip">Particle Systems</span>
+      <span class="chip">Curve Editor</span>
+      <span class="chip">Sub-Emitters</span>
+      <span class="chip">Burst System</span>
+      <span class="chip">PhysX Collision</span>
+      <span class="chip">Decal Spawning</span>
+      <span class="chip">JSON Serialisation</span>
+      <span class="chip">Shader Integration</span>
+      <span class="chip">Debug Visualisation</span>
+      <span class="chip">Custom Engine (TGE)</span>
+    </div>
+  </div>
+
+  <!-- ── TECHNICAL HIGHLIGHTS ──────────────────────────────────────── -->
+  <div class="p-section">
+    <h2>Technical Highlights</h2>
+    <p>
+      The data layer uses a <code style="font-family:'Share Tech Mono',monospace;font-size:0.9em;color:var(--accent);">CopyOnWriteWrapper&lt;ParticleEmitterData&gt;</code> — the editor holds a read-only view and only allocates a mutable copy the moment a field is changed, making the system safe for undo and sub-emitter nesting without defensive copying. Spawn shapes are oriented to any arbitrary axis using a custom Rodrigues rotation that avoids gimbal lock — the same helper runs in both the runtime emitter and the debug wireframe draw, keeping visual and actual spawn positions in perfect sync. The colour over-lifetime editor renders a live 50-segment gradient bar into the ImGui draw list by evaluating all four channel curves simultaneously, giving artists instant colour feedback before any particle is simulated.
+    </p>
+  </div>
+
+  <!-- ── DEVELOPMENT BREAKDOWN ─────────────────────────────────────── -->
+  <div class="deep-dive">
+    <h2>Development Breakdown</h2>
+
+    <!-- ─ Step 1 — Sub-Emitter Architecture ─ -->
+    <div class="dd-block">
+      <div class="dd-text">
+        <span class="dd-step">Step 01 — Data Architecture</span>
+        <div class="dd-title">Sub-Emitter Nesting with Copy-on-Write</div>
+        <p class="dd-desc">
+          Each emitter is a <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">CopyOnWriteWrapper&lt;ParticleEmitterData&gt;</code> that owns a flat list of child sub-emitters. The editor holds a read-only view and only calls <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">.Edit()</code> at the exact moment a field changes. Sub-emitters are added, named, and removed at runtime from collapsing headers in the editor panel. The whole structure serialises symmetrically — every field written by <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">WriteToJson</code> is read back by <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">LoadFromJson</code> with presence checks so older assets load cleanly without crashing.
+        </p>
+        <div class="dd-toggle-group">
+          <button class="dd-toggle-btn active" onclick="setMediaMode('tools-media-1','image',this)">
+            <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
+            Image
+          </button>
+          <button class="dd-toggle-btn" onclick="setMediaMode('tools-media-1','code',this)">
+            <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+            Code
+          </button>
         </div>
       </div>
-
-      <div class="p-section">
-        <h2>Technical Highlights</h2>
-        <p>Every HUD element inherits from a shared Button base class that handles dragging, visibility, camera binding, and input registration — meaning adding a new movable frame takes minimal code. The edit mode uses a grid snap system with a configurable grid size (25–200px), and an element snap system that detects nearby frame edges and snaps to them automatically. The buff/debuff overlap resolver detects collisions between the buff and debuff frames and pushes them apart using the minimum displacement direction — preventing z-fighting and visual overlap without any manual positioning from the player.</p>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════
-           DEVELOPMENT BREAKDOWN — comes FIRST
-           ═══════════════════════════════════════════════════ -->
-      <div class="deep-dive">
-        <h2>Development Breakdown</h2>
-
-        <!-- Step 1 -->
-        <div class="dd-block">
-          <div class="dd-text">
-            <span class="dd-step">Step 01 — Normal View</span>
-            <div class="dd-title">A Complete In-Game HUD</div>
-            <p class="dd-desc">The normal gameplay view shows the full HUD in action — player and target unit frames with portraits, HP and mana bars, five party frames on the left, two action bars with spell icons and cooldown timers, buff icons with duration countdowns, and a cast bar that appears when casting. Everything is live and functional.</p>
+      <div class="dd-media-panel" id="tools-media-1">
+        <img src="Images/Particles/particle_step1.png" alt="Sub-emitter editor panel">
+        <div class="dd-code-view">
+          <div class="dd-code-header">
+            <span class="dd-code-filename">ParticleEmitterData — JSON round-trip</span>
+            <span class="dd-code-lang">C++</span>
           </div>
-          <div class="dd-media-panel" id="media-step1">
-            <img src="Images/HUD/Normal_view.png" alt="Normal View">
-          </div>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="dd-block reverse">
-          <div class="dd-text">
-            <span class="dd-step">Step 02 — Edit Mode</span>
-            <div class="dd-title">Live Grid, Draggable Frames & Debug Bounds</div>
-            <p class="dd-desc">Pressing the edit mode toggle overlays a purple grid across the screen and draws debug bounding boxes around every HUD element. All frames become draggable — snap-to-grid keeps them aligned, and snap-to-elements lets frames lock to each other's edges. The HUD Edit Mode panel appears at the centre, letting the player check/uncheck individual frames and adjust the grid size with a live slider.</p>
-            <div class="dd-toggle-group">
-              <button class="dd-toggle-btn active" onclick="setMediaMode('media-step2','image',this)">
-                <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
-                Image
-              </button>
-              <button class="dd-toggle-btn" onclick="setMediaMode('media-step2','video',this)">
-                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                Video
-              </button>
-            </div>
-          </div>
-          <div class="dd-media-panel" id="media-step2">
-            <img src="Images/HUD/Edit_mode_view.png" alt="Edit Mode">
-            <video src="Images/HUD/editmode_video.mp4" muted loop playsinline></video>
-          </div>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="dd-block">
-          <div class="dd-text">
-            <span class="dd-step">Step 03 — Advanced Options</span>
-            <div class="dd-title">Two-Mode Settings Panel</div>
-            <p class="dd-desc">The HUD Edit Panel has two modes — compact and advanced. In compact mode it shows the most common toggles. Enabling Advanced Options expands the panel and reveals extra sections: Frames (Pet Frame, Raid Frames) and Combat (Cast Bar, Stance Bar, Pet Bar). The panel itself is draggable in edit mode. All checkboxes wire directly to the HudEditSettings struct which propagates visibility changes to every frame instantly.</p>
-          </div>
-          <div class="dd-media-panel">
-            <img id="advancedOptionsImg" src="Images/HUD/Editmode_Advanced_options.png" alt="Advanced Options">
-          </div>
-        </div>
-
-        <!-- Step 4 -->
-        <div class="dd-block reverse">
-          <div class="dd-text">
-            <span class="dd-step">Step 04 — Button Base Class</span>
-            <div class="dd-title">Shared Architecture for Every HUD Element</div>
-            <p class="dd-desc">Every HUD element — player frame, target frame, action bar slots, cast bar — inherits from a single Button base class. It handles dragging, hover detection, child propagation, visibility, camera binding, and debug rendering. Adding a new movable frame takes almost no boilerplate code.</p>
-            <div class="dd-toggle-group">
-              <button class="dd-toggle-btn active" onclick="setMediaMode('media-step4','image',this)">
-                <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
-                Image
-              </button>
-              <button class="dd-toggle-btn" onclick="setMediaMode('media-step4','code',this)">
-                <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
-                Code
-              </button>
-            </div>
-          </div>
-          <div class="dd-media-panel" id="media-step4">
-            <img src="Images/HUD/button_code.png" alt="Button Base Class Code">
-            <div class="dd-code-view">
-              <div class="dd-code-header"><span class="dd-code-filename">Button.h</span><span class="dd-code-lang">C++</span></div>
-              <pre><code><span class="tok-kw">class</span> <span class="tok-type">Button</span> : <span class="tok-kw">public</span> <span class="tok-type">InputObserver</span>
+          <pre><code><span class="tok-comment">// LoadFromJson — presence-checked for back-compat</span>
+<span class="tok-kw">if</span> (someJson.<span class="tok-fn">contains</span>(<span class="tok-lit">"subEmitters"</span>))
 {
-<span class="tok-kw">public</span>:
-  <span class="tok-comment">// Drag & drop</span>
-  <span class="tok-kw">void</span> <span class="tok-fn">SetDraggable</span>(<span class="tok-kw">bool</span> aValue);
-  <span class="tok-kw">void</span> <span class="tok-fn">MoveBy</span>(<span class="tok-kw">const</span> Vector2f&amp; delta);
-  <span class="tok-kw">bool</span> <span class="tok-fn">IsDragging</span>() <span class="tok-kw">const</span>;
-
-  <span class="tok-comment">// Visibility & parenting</span>
-  <span class="tok-kw">void</span> <span class="tok-fn">SetVisible</span>(<span class="tok-kw">bool</span> v) { myIsVisible = v; }
-  <span class="tok-kw">void</span> <span class="tok-fn">AddChild</span>(Button* child);
-  Button* <span class="tok-fn">GetParent</span>() <span class="tok-kw">const</span>;
-
-  <span class="tok-comment">// Camera & input</span>
-  <span class="tok-kw">virtual void</span> <span class="tok-fn">SetCamera</span>(shared_ptr&lt;Camera&gt; cam);
-  <span class="tok-kw">virtual void</span> <span class="tok-fn">RegisterInput</span>() <span class="tok-kw">override</span>;
-  <span class="tok-kw">void</span> <span class="tok-fn">DebugDrawBounds</span>(<span class="tok-kw">const</span> Color&amp; color) <span class="tok-kw">const</span>;
-
-<span class="tok-kw">protected</span>:
-  <span class="tok-kw">void</span> <span class="tok-fn">SetPosition2D</span>(<span class="tok-kw">const</span> Vector2f&amp; newPos);
-  <span class="tok-kw">void</span> <span class="tok-fn">PropagateMoveToChildren</span>(<span class="tok-kw">const</span> Vector2f&amp; delta);
-
-  <span class="tok-kw">bool</span> myIsDraggable = <span class="tok-lit">false</span>;
-  <span class="tok-kw">bool</span> myIsDragging  = <span class="tok-lit">false</span>;
-  Vector2f myDragOffset = { <span class="tok-num">0.f</span>, <span class="tok-num">0.f</span> };
-  Button* myParent = <span class="tok-lit">nullptr</span>;
-  vector&lt;Button*&gt; myChildren;
-};</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 5 -->
-        <div class="dd-block">
-          <div class="dd-text">
-            <span class="dd-step">Step 05 — Child Propagation</span>
-            <div class="dd-title">Move Propagates to All Children</div>
-            <p class="dd-desc">When a frame moves, SetPosition2D calculates the delta and calls PropagateMoveToChildren — which recursively repositions every child without touching their text layers. This means a player frame dragged in edit mode automatically carries its portrait, bars, and name text together as one unit.</p>
-            <div class="dd-toggle-group">
-              <button class="dd-toggle-btn active" onclick="setMediaMode('media-step5','image',this)">
-                <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
-                Image
-              </button>
-              <button class="dd-toggle-btn" onclick="setMediaMode('media-step5','code',this)">
-                <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
-                Code
-              </button>
-            </div>
-          </div>
-          <div class="dd-media-panel" id="media-step5">
-            <img src="Images/HUD/Move_Propagates_picture.png" alt="Child Propagation">
-            <div class="dd-code-view">
-              <div class="dd-code-header"><span class="dd-code-filename">Button.cpp</span><span class="dd-code-lang">C++</span></div>
-              <pre><code><span class="tok-kw">void</span> Button::<span class="tok-fn">SetPosition2D</span>(<span class="tok-kw">const</span> Vector2f&amp; aNewPos)
-{
-  <span class="tok-kw">const</span> Vector2f delta = aNewPos - myPosition;
-  myPosition = aNewPos;
-
-  <span class="tok-kw">const float</span> z = myTransform.<span class="tok-fn">GetPosition</span>().z;
-  mySprite.<span class="tok-fn">SetPosition</span>({ myPosition.x, myPosition.y, z });
-  myTransform.<span class="tok-fn">SetPosition</span>({ myPosition.x, myPosition.y, z });
-
-  <span class="tok-kw">for</span> (<span class="tok-kw">auto</span>&amp; t : myTexts)
-    t.<span class="tok-fn">SetPosition</span>(t.<span class="tok-fn">GetPosition</span>() + delta);
-
-  <span class="tok-fn">PropagateMoveToChildren</span>(delta);
+  <span class="tok-kw">for</span> (<span class="tok-kw">auto</span>&amp; subJson : someJson[<span class="tok-lit">"subEmitters"</span>])
+  {
+    CopyOnWriteWrapper&lt;ParticleEmitterData&gt; subWrapper =
+      CopyOnWriteWrapper&lt;ParticleEmitterData&gt;::<span class="tok-fn">Create</span>();
+    <span class="tok-fn">LoadFromJson</span>(subWrapper, subJson);
+    d.subEmitters.<span class="tok-fn">push_back</span>(subWrapper.<span class="tok-fn">Get</span>());
+  }
 }
 
-<span class="tok-kw">void</span> Button::<span class="tok-fn">PropagateMoveToChildren</span>(<span class="tok-kw">const</span> Vector2f&amp; delta)
+<span class="tok-comment">// WriteToJson — mirrors every field symmetrically</span>
+nlohmann::json subEmittersJson = nlohmann::json::<span class="tok-fn">array</span>();
+<span class="tok-kw">for</span> (<span class="tok-kw">auto</span>&amp; sub : d.subEmitters)
 {
-  <span class="tok-kw">for</span> (Button* c : myChildren)
-  {
-    <span class="tok-kw">if</span> (!c) <span class="tok-kw">continue</span>;
-    c-&gt;<span class="tok-fn">SetPosition2D_NoText</span>(c-&gt;<span class="tok-fn">GetPosition</span>() + delta);
-  }
-}</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 6 -->
-        <div class="dd-block reverse">
-          <div class="dd-text">
-            <span class="dd-step">Step 06 — Drag & Drop</span>
-            <div class="dd-title">Grab-Point-Accurate Dragging</div>
-            <p class="dd-desc">When a draggable frame receives a left-click while hovered, it enters drag mode and stores the cursor offset from the frame centre. Every subsequent hover event moves the frame to cursor minus offset — giving smooth, grab-point-accurate dragging regardless of where you click the frame.</p>
-            <div class="dd-toggle-group">
-              <button class="dd-toggle-btn active" onclick="setMediaMode('media-step6','image',this)">
-                <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
-                Image
-              </button>
-              <button class="dd-toggle-btn" onclick="setMediaMode('media-step6','video',this)">
-                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                Video
-              </button>
-              <button class="dd-toggle-btn" onclick="setMediaMode('media-step6','code',this)">
-                <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
-                Code
-              </button>
-            </div>
-          </div>
-          <div class="dd-media-panel" id="media-step6">
-            <img src="Images/HUD/Grab-Point_picture.png" alt="Drag and Drop">
-            <video src="Images/HUD/editmode_video.mp4" muted loop playsinline></video>
-            <div class="dd-code-view">
-              <div class="dd-code-header"><span class="dd-code-filename">Button.cpp — ReceiveInput</span><span class="dd-code-lang">C++</span></div>
-              <pre><code><span class="tok-kw">case</span> InputEvent::Hover:
-{
-  Vector2f mousePos =
-    myCamera-&gt;<span class="tok-fn">GetScreenToWorldCoordinatesVec2</span>(mouseScreenPos);
-
-  <span class="tok-comment">// If dragging: move frame to cursor position</span>
-  <span class="tok-kw">if</span> (myIsDragging)
-  {
-    <span class="tok-fn">SetPosition2D</span>(mousePos - myDragOffset);
-    <span class="tok-kw">break</span>;
-  }
-  <span class="tok-comment">// ... normal hover check ...</span>
+  nlohmann::json subJson;
+  CopyOnWriteWrapper&lt;ParticleEmitterData&gt; subWrapper =
+    CopyOnWriteWrapper&lt;ParticleEmitterData&gt;::<span class="tok-fn">Create</span>();
+  subWrapper.<span class="tok-fn">Edit</span>() = sub;
+  <span class="tok-fn">WriteToJson</span>(subWrapper, subJson);
+  subEmittersJson.<span class="tok-fn">push_back</span>(subJson);
 }
-
-<span class="tok-kw">case</span> InputEvent::MenuLClick:
-{
-  <span class="tok-kw">if</span> (myIsDraggable &amp;&amp; myIsHovered)
-  {
-    myIsDragging = <span class="tok-lit">true</span>;
-    <span class="tok-comment">// Store offset so frame doesn't snap to cursor centre</span>
-    myDragOffset = mousePos - myPosition;
-  }
-}</code></pre>
-            </div>
-          </div>
+someJson[<span class="tok-lit">"subEmitters"</span>] = subEmittersJson;</code></pre>
         </div>
+      </div>
+    </div>
 
-        <!-- Step 7 -->
-        <div class="dd-block">
-          <div class="dd-text">
-            <span class="dd-step">Step 07 — Grid Snap</span>
-            <div class="dd-title">Configurable Snap-to-Grid System</div>
-            <p class="dd-desc">When snap-to-grid is enabled, every slot position is rounded to the nearest grid cell before being applied. The grid size is configurable via a live slider (25–200px, snaps to 5px increments). A single ApplySnap function handles all the rounding math — clean and reusable across every frame type.</p>
-            <div class="dd-toggle-group">
-              <button class="dd-toggle-btn active" onclick="setMediaMode('media-step7','image',this)">
-                <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
-                Image
-              </button>
-              <button class="dd-toggle-btn" onclick="setMediaMode('media-step7','code',this)">
-                <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
-                Code
-              </button>
-            </div>
+    <!-- ─ Step 2 — Over-Lifetime Curves ─ -->
+    <div class="dd-block reverse">
+      <div class="dd-text">
+        <span class="dd-step">Step 02 — Over-Lifetime Curves</span>
+        <div class="dd-title">Nine Editable Curves with Live Colour Preview</div>
+        <p class="dd-desc">
+          Size, velocity (X/Y/Z), colour (R/G/B/A), and rotation are all curve-driven. The colour section evaluates all four channel curves simultaneously and renders a live 50-segment gradient bar directly into the ImGui draw list — so artists see the full colour transition instantly before any particle is spawned. Each velocity channel has its own sub-tab (X / Y / Z) with independent curve editing. All curve data flows through to the pixel and vertex shaders at runtime, keeping editor preview and in-game output in sync.
+        </p>
+        <div class="dd-toggle-group">
+          <button class="dd-toggle-btn active" onclick="setMediaMode('tools-media-2','image',this)">
+            <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
+            Image
+          </button>
+          <button class="dd-toggle-btn" onclick="setMediaMode('tools-media-2','video',this)">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            Video
+          </button>
+          <button class="dd-toggle-btn" onclick="setMediaMode('tools-media-2','code',this)">
+            <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+            Code
+          </button>
+        </div>
+      </div>
+      <div class="dd-media-panel" id="tools-media-2">
+        <img src="Images/Particles/particle_step2.png" alt="Curve editor with gradient bar">
+        <video src="Videos/Particles/curve_editor.mp4" muted loop playsinline></video>
+        <div class="dd-code-view">
+          <div class="dd-code-header">
+            <span class="dd-code-filename">Colour gradient preview bar</span>
+            <span class="dd-code-lang">C++</span>
           </div>
-          <div class="dd-media-panel" id="media-step7">
-            <img src="Images/HUD/Configurable_Snap-to-Grid_System_picture.png" alt="Grid Snap">
-            <div class="dd-code-view">
-              <div class="dd-code-header"><span class="dd-code-filename">ActionBar.cpp</span><span class="dd-code-lang">C++</span></div>
-              <pre><code><span class="tok-comment">// During layout rebuild — apply snap if enabled</span>
-Vector2f p = <span class="tok-fn">GetSlotPos</span>(i);
-<span class="tok-kw">if</span> (myLayout.snapToGrid)
-  p = <span class="tok-fn">ApplySnap</span>(p);
-
-slot-&gt;<span class="tok-fn">SetPosition</span>(p);
-
-<span class="tok-comment">// Snap function — rounds to nearest grid cell</span>
-Vector2f ActionBar::<span class="tok-fn">ApplySnap</span>(<span class="tok-kw">const</span> Vector2f&amp; p) <span class="tok-kw">const</span>
+          <pre><code><span class="tok-comment">// Evaluate all 4 channel curves at normalised time t</span>
+<span class="tok-kw">auto</span> EvaluateColorAt = [&](<span class="tok-kw">float</span> t) -> ImVec4
 {
-  <span class="tok-kw">const float</span> g = std::<span class="tok-fn">max</span>(<span class="tok-num">1.f</span>, myLayout.gridSize);
-  <span class="tok-kw">return</span> {
-    std::<span class="tok-fn">round</span>(p.x / g) * g,
-    std::<span class="tok-fn">round</span>(p.y / g) * g
+  <span class="tok-kw">auto</span> eval = [&](<span class="tok-kw">const</span> std::vector&lt;CurveKey&gt;&amp; curve)
+  {
+    <span class="tok-kw">if</span> (curve.<span class="tok-fn">empty</span>()) <span class="tok-kw">return</span> <span class="tok-num">1.f</span>;
+    <span class="tok-kw">for</span> (<span class="tok-type">size_t</span> i = <span class="tok-num">1</span>; i &lt; curve.<span class="tok-fn">size</span>(); ++i)
+    {
+      <span class="tok-kw">if</span> (t &lt;= curve[i].time)
+      {
+        <span class="tok-kw">float</span> localT = (t - curve[i-<span class="tok-num">1</span>].time)
+                     / (curve[i].time - curve[i-<span class="tok-num">1</span>].time);
+        <span class="tok-kw">return</span> curve[i-<span class="tok-num">1</span>].value * (<span class="tok-num">1.f</span> - localT)
+             + curve[i].value * localT;
+      }
+    }
+    <span class="tok-kw">return</span> curve.<span class="tok-fn">back</span>().value;
   };
+  <span class="tok-kw">return</span> ImVec4(<span class="tok-fn">eval</span>(data.colorOverLifetimeR),
+                <span class="tok-fn">eval</span>(data.colorOverLifetimeG),
+                <span class="tok-fn">eval</span>(data.colorOverLifetimeB),
+                <span class="tok-fn">eval</span>(data.colorOverLifetimeA));
+};
+
+<span class="tok-comment">// Draw 50-segment bar directly into the ImGui drawlist</span>
+ImVec2 barPos = ImGui::<span class="tok-fn">GetCursorScreenPos</span>();
+<span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">0</span>; i &lt; <span class="tok-num">50</span>; ++i)
+{
+  <span class="tok-kw">float</span> t0 = <span class="tok-kw">float</span>(i) / <span class="tok-num">50</span>;
+  ImVec4 col = <span class="tok-fn">EvaluateColorAt</span>(t0);
+  ImGui::<span class="tok-fn">GetWindowDrawList</span>()-&gt;<span class="tok-fn">AddRectFilled</span>(
+    ImVec2(barPos.x + t0 * barSize.x, barPos.y),
+    ImVec2(barPos.x + (t0 + <span class="tok-num">0.02f</span>) * barSize.x,
+           barPos.y + barSize.y),
+    IM_COL32(col.x*<span class="tok-num">255</span>, col.y*<span class="tok-num">255</span>,
+             col.z*<span class="tok-num">255</span>, col.w*<span class="tok-num">255</span>));
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─ Step 3 — Spawn Shapes + Rodrigues Rotation ─ -->
+    <div class="dd-block">
+      <div class="dd-text">
+        <span class="dd-step">Step 03 — Spawn Shapes</span>
+        <div class="dd-title">Seven Shapes Oriented via Rodrigues Rotation</div>
+        <p class="dd-desc">
+          The system supports Point, Sphere, Hollow Sphere, Cone, Box, Circle, and Edge. Every shape except Point is oriented to an arbitrary <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">spawnDirection</code> vector using a custom Rodrigues rotation — a compact formula that rotates any local-space vector onto a target axis in a single pass, with explicit edge-case handling for parallel and anti-parallel inputs. The same <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">RotateOntoAxis</code> lambda runs inside both <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">CalculateParticleSpawn</code> and <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">DrawShapeDebug</code>, so the debug wireframe always matches the actual spawn volume exactly.
+        </p>
+        <div class="dd-toggle-group">
+          <button class="dd-toggle-btn active" onclick="setMediaMode('tools-media-3','image',this)">
+            <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
+            Image
+          </button>
+          <button class="dd-toggle-btn" onclick="setMediaMode('tools-media-3','code',this)">
+            <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+            Code
+          </button>
+        </div>
+      </div>
+      <div class="dd-media-panel" id="tools-media-3">
+        <img src="Images/Particles/particle_step3.png" alt="Spawn shapes editor">
+        <div class="dd-code-view">
+          <div class="dd-code-header">
+            <span class="dd-code-filename">CalculateParticleSpawn — Rodrigues rotation</span>
+            <span class="dd-code-lang">C++</span>
+          </div>
+          <pre><code><span class="tok-comment">// Rodrigues rotation: rotates local-space vector v
+// onto target axis in one pass — no gimbal lock</span>
+<span class="tok-kw">auto</span> RotateOntoAxis = [](Vector3f v, Vector3f axis) -> Vector3f
+{
+  <span class="tok-kw">const</span> Vector3f up = { <span class="tok-num">0.f</span>, <span class="tok-num">1.f</span>, <span class="tok-num">0.f</span> };
+  <span class="tok-kw">float</span> dot = axis.x*up.x + axis.y*up.y + axis.z*up.z;
+
+  <span class="tok-comment">// Edge cases: already aligned or exactly opposite</span>
+  <span class="tok-kw">if</span> (std::<span class="tok-fn">abs</span>(dot - <span class="tok-num">1.f</span>) &lt; <span class="tok-num">1e-5f</span>) <span class="tok-kw">return</span> v;
+  <span class="tok-kw">if</span> (std::<span class="tok-fn">abs</span>(dot + <span class="tok-num">1.f</span>) &lt; <span class="tok-num">1e-5f</span>)
+    <span class="tok-kw">return</span> { -v.x, -v.y, -v.z };
+
+  <span class="tok-comment">// Rotation axis k = normalize(up × axis)</span>
+  Vector3f k = {
+    up.y*axis.z - up.z*axis.y,
+    up.z*axis.x - up.x*axis.z,
+    up.x*axis.y - up.y*axis.x
+  };
+  <span class="tok-kw">float</span> kLen = std::<span class="tok-fn">sqrt</span>(k.x*k.x + k.y*k.y + k.z*k.z);
+  k = { k.x/kLen, k.y/kLen, k.z/kLen };
+
+  <span class="tok-kw">float</span> a = std::<span class="tok-fn">acos</span>(std::<span class="tok-fn">clamp</span>(dot, -<span class="tok-num">1.f</span>, <span class="tok-num">1.f</span>));
+  <span class="tok-kw">float</span> c = std::<span class="tok-fn">cos</span>(a), s = std::<span class="tok-fn">sin</span>(a), t = <span class="tok-num">1.f</span> - c;
+
+  <span class="tok-kw">return</span> {
+    (t*k.x*k.x+c)*v.x    + (t*k.x*k.y-s*k.z)*v.y + (t*k.x*k.z+s*k.y)*v.z,
+    (t*k.x*k.y+s*k.z)*v.x + (t*k.y*k.y+c)*v.y    + (t*k.y*k.z-s*k.x)*v.z,
+    (t*k.x*k.z-s*k.y)*v.x + (t*k.y*k.z+s*k.x)*v.y + (t*k.z*k.z+c)*v.z
+  };
+};</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─ Step 4 — DrawShapeDebug ─ -->
+    <div class="dd-block reverse">
+      <div class="dd-text">
+        <span class="dd-step">Step 04 — Shape Debug Overlay</span>
+        <div class="dd-title">Live Per-Shape Wireframes in the Editor Viewport</div>
+        <p class="dd-desc">
+          <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">DrawShapeDebug</code> is a static function that draws shape-accurate wireframes directly into the engine's debug draw layer — a full ring for Sphere, a cone silhouette with base ring and side lines for Cone, a full 12-edge box for Box, and so on. It runs every frame inside <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">ObjectDefinitionDocument::Update</code> after the render pipeline so the lines composite on top of the live particle preview. Because it uses the same <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">RotateOntoAxis</code> helper as the runtime emitter, the wireframe always matches the actual spawn volume — editing the cone angle live moves both the particles and the debug outline together.
+        </p>
+        <div class="dd-toggle-group">
+          <button class="dd-toggle-btn active" onclick="setMediaMode('tools-media-4','image',this)">
+            <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
+            Image
+          </button>
+          <button class="dd-toggle-btn" onclick="setMediaMode('tools-media-4','video',this)">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            Video
+          </button>
+          <button class="dd-toggle-btn" onclick="setMediaMode('tools-media-4','code',this)">
+            <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+            Code
+          </button>
+        </div>
+      </div>
+      <div class="dd-media-panel" id="tools-media-4">
+        <img src="Images/Particles/particle_step4.png" alt="Shape debug wireframe overlay">
+        <video src="Videos/Particles/shape_debug.mp4" muted loop playsinline></video>
+        <div class="dd-code-view">
+          <div class="dd-code-header">
+            <span class="dd-code-filename">DrawShapeDebug — Cone &amp; Box cases</span>
+            <span class="dd-code-lang">C++</span>
+          </div>
+          <pre><code><span class="tok-kw">case</span> Shape::Cone:
+{
+  <span class="tok-kw">float</span> h = ed.coneHeight;
+  <span class="tok-kw">float</span> r = h * tanf(ed.coneAngle * PI / <span class="tok-num">180.f</span>);
+  Vector3f apex = center + axis * h;
+
+  <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">0</span>; i &lt; segments; i++)
+  {
+    <span class="tok-kw">float</span> a0 = (<span class="tok-kw">float</span>)i / segments * <span class="tok-num">2.f</span> * PI;
+    <span class="tok-kw">float</span> a1 = (<span class="tok-kw">float</span>)(i+<span class="tok-num">1</span>) / segments * <span class="tok-num">2.f</span> * PI;
+
+    <span class="tok-comment">// Base ring — oriented onto spawnDirection</span>
+    Vector3f p0 = center +
+      <span class="tok-fn">RotateOntoAxis</span>({ cosf(a0)*r, <span class="tok-num">0.f</span>, sinf(a0)*r }, axis);
+    Vector3f p1 = center +
+      <span class="tok-fn">RotateOntoAxis</span>({ cosf(a1)*r, <span class="tok-num">0.f</span>, sinf(a1)*r }, axis);
+
+    <span class="tok-fn">AddLine</span>(p0, p1);   <span class="tok-comment">// base ring segment</span>
+    <span class="tok-fn">AddLine</span>(apex, p0); <span class="tok-comment">// side line to apex</span>
+  }
+  <span class="tok-kw">break</span>;
 }
-
-<span class="tok-comment">// Slider snaps to 5px increments (25–200px range)</span>
-s.gridSize = minG + t * (maxG - minG);
-s.gridSize = std::<span class="tok-fn">round</span>(s.gridSize / <span class="tok-num">5.f</span>) * <span class="tok-num">5.f</span>;</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 8 -->
-        <div class="dd-block reverse">
-          <div class="dd-text">
-            <span class="dd-step">Step 08 — Action Bar Editor</span>
-            <div class="dd-title">Per-Bar Layout Control</div>
-            <p class="dd-desc">Each action bar has its own edit popup — orientation (horizontal/vertical), number of rows, number of icons, icon size (with a live px slider), icon padding, and an "Always Show Buttons" toggle. Changes apply immediately to the bar's layout. Bars can be dragged freely in edit mode and snap to each other, allowing players to stack them or spread them anywhere on screen.</p>
-            <div class="dd-toggle-group">
-              <button class="dd-toggle-btn active" onclick="setMediaMode('media-step8','image',this)">
-                <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
-                Image
-              </button>
-              <button class="dd-toggle-btn" onclick="setMediaMode('media-step8','video',this)">
-                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                Video
-              </button>
-            </div>
-          </div>
-          <div class="dd-media-panel" id="media-step8">
-            <img src="Images/HUD/ActionBar_editmode_popup.png" alt="Action Bar Popup">
-            <video src="Images/HUD/actionbar_edit_video.mp4" muted loop playsinline></video>
-          </div>
-        </div>
-
-       <!-- Step 9 -->
-      <div class="dd-block">
-        <div class="dd-text">
-          <span class="dd-step">Step 09 — Spellbook & Tooltips</span>
-          <div class="dd-title">Spell Assignment & Rich Tooltips</div>
-          <p class="dd-desc">Clicking an empty action bar slot opens the spellbook popup showing all available spells as icon buttons. Clicking a spell assigns it to that slot and closes the spellbook. Hovering a filled slot shows a rich tooltip: spell name, mana cost, cast time (or "Instant cast"), and a damage description line. Spells have cooldowns, cast times, and trigger buffs/debuffs on the HUD when used.</p>
-          <div class="dd-toggle-group">
-            <button class="dd-toggle-btn active" onclick="setStep9Image('Images/HUD/Spell_tooltip_popup.png', this)">
-              <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
-              Tooltip
-            </button>
-            <button class="dd-toggle-btn" onclick="setStep9Image('Images/HUD/Chose_spellPopup.png', this)">
-              <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
-              Spellbook
-            </button>
-          </div>
-        </div>
-        <div class="dd-media-panel" id="media-step9">
-          <img id="step9Img" src="Images/HUD/Spell_tooltip_popup.png" alt="Spell Tooltip">
+<span class="tok-kw">case</span> Shape::Box:
+{
+  <span class="tok-kw">float</span> hx = ed.boxSize.x*<span class="tok-num">0.5f</span>,
+        hy = ed.boxSize.y*<span class="tok-num">0.5f</span>,
+        hz = ed.boxSize.z*<span class="tok-num">0.5f</span>;
+  <span class="tok-comment">// Bottom face + top face + 4 vertical edges</span>
+  <span class="tok-fn">AddLine</span>({center.x-hx,center.y-hy,center.z-hz},
+          {center.x+hx,center.y-hy,center.z-hz});
+  <span class="tok-comment">// ... (12 edges total)</span>
+  <span class="tok-kw">break</span>;
+}</code></pre>
         </div>
       </div>
+    </div>
 
-      </div><!-- /deep-dive -->
-
-      <!-- ═══════════════════════════════════════════════════
-           FEATURE SHOWCASE — comes AFTER Development Breakdown
-           ═══════════════════════════════════════════════════ -->
-      <div class="p-section">
-        <h2>Feature Showcase</h2>
-        <div class="hud-feature-grid">
-          <div class="hud-feature-tile" onclick="openHudLightbox('Images/HUD/Normal_view.png')"><img src="Images/HUD/Normal_view.png" alt="Normal View"><div class="hud-feature-caption">Normal Gameplay View</div></div>
-          <div class="hud-feature-tile" onclick="openHudLightbox('Images/HUD/Edit_mode_view.png')"><img src="Images/HUD/Edit_mode_view.png" alt="Edit Mode"><div class="hud-feature-caption">HUD Edit Mode</div></div>
-          <div class="hud-feature-tile" onclick="openHudLightbox('Images/HUD/Editmode_Advanced_options.png')"><img src="Images/HUD/Editmode_Advanced_options.png" alt="Advanced Options"><div class="hud-feature-caption">Advanced Options Panel</div></div>
-          <div class="hud-feature-tile" onclick="openHudLightbox('Images/HUD/Targetframe_editmode.png')"><img src="Images/HUD/Targetframe_editmode.png" alt="Target Frame"><div class="hud-feature-caption">Target Frame Scale Popup</div></div>
-          <div class="hud-feature-tile" onclick="openHudLightbox('Images/HUD/Partyframes_editmode.png')"><img src="Images/HUD/Partyframes_editmode.png" alt="Party Frames"><div class="hud-feature-caption">Party Frame Settings</div></div>
-          <div class="hud-feature-tile" onclick="openHudLightbox('Images/HUD/Playerframe_editmode.png')"><img src="Images/HUD/Playerframe_editmode.png" alt="Player Frame Scale"><div class="hud-feature-caption">Player Frame Scale Popup</div></div>
-          <div class="hud-feature-tile" onclick="openHudLightbox('Images/HUD/ActionBar_editmode_popup.png')"><img src="Images/HUD/ActionBar_editmode_popup.png" alt="Action Bar Popup"><div class="hud-feature-caption">Action Bar Edit Popup</div></div>
-          <div class="hud-feature-tile" onclick="openHudLightbox('Images/HUD/Chose_spellPopup.png')"><img src="Images/HUD/Chose_spellPopup.png" alt="Spellbook"><div class="hud-feature-caption">Spellbook Popup</div></div>
-          <div class="hud-feature-tile" onclick="openHudLightbox('Images/HUD/Spell_tooltip_popup.png')"><img src="Images/HUD/Spell_tooltip_popup.png" alt="Spell Tooltip"><div class="hud-feature-caption">Spell Tooltip</div></div>
+    <!-- ─ Step 5 — Burst System ─ -->
+    <div class="dd-block">
+      <div class="dd-text">
+        <span class="dd-step">Step 05 — Burst System</span>
+        <div class="dd-title">Timed Bursts with Cycles and Intervals</div>
+        <p class="dd-desc">
+          Each emitter supports any number of bursts, each with a trigger time, particle count, cycle count (−1 for infinite repeat), and repeat interval. Burst state is tracked per-burst in a <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">BurstState</code> struct that persists across frames — when a burst fires, it increments <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">cyclesFired</code> and schedules the next fire time by adding the interval. A cycle count of −1 keeps it firing indefinitely. Bursts can be added and removed live in the editor panel. This made it straightforward to author a boss ability that emits a large burst at a specific moment and then pulses repeatedly for the rest of the attack.
+        </p>
+        <div class="dd-toggle-group">
+          <button class="dd-toggle-btn active" onclick="setMediaMode('tools-media-5','image',this)">
+            <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
+            Image
+          </button>
+          <button class="dd-toggle-btn" onclick="setMediaMode('tools-media-5','video',this)">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            Video
+          </button>
+          <button class="dd-toggle-btn" onclick="setMediaMode('tools-media-5','code',this)">
+            <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+            Code
+          </button>
         </div>
       </div>
+      <div class="dd-media-panel" id="tools-media-5">
+        <img src="Images/Particles/particle_step5.png" alt="Burst system editor">
+        <video src="Videos/Particles/burst_system.mp4" muted loop playsinline></video>
+        <div class="dd-code-view">
+          <div class="dd-code-header">
+            <span class="dd-code-filename">ParticleEmitter.cpp — burst tick</span>
+            <span class="dd-code-lang">C++</span>
+          </div>
+          <pre><code><span class="tok-comment">// Per-burst state tracked across frames</span>
+<span class="tok-kw">struct</span> <span class="tok-type">BurstState</span>
+{
+  <span class="tok-kw">int</span>   cyclesFired  = <span class="tok-num">0</span>;
+  <span class="tok-kw">float</span> nextFireTime = -<span class="tok-num">1.f</span>; <span class="tok-comment">// -1 = not yet armed</span>
+};
 
-    </div><!-- /p-body -->
+<span class="tok-comment">// Evaluated every Update() per emitter</span>
+<span class="tok-kw">for</span> (<span class="tok-type">size_t</span> i = <span class="tok-num">0</span>; i &lt; emitter.data.bursts.<span class="tok-fn">size</span>(); i++)
+{
+  <span class="tok-kw">auto</span>&amp; state = emitter.burstStates[i];
+  <span class="tok-kw">if</span> (state.nextFireTime &lt; <span class="tok-num">0.f</span>) <span class="tok-kw">continue</span>;
+
+  <span class="tok-kw">if</span> (emitter.emitterElapsed &gt;= state.nextFireTime)
+  {
+    <span class="tok-kw">for</span> (<span class="tok-kw">int</span> b = <span class="tok-num">0</span>; b &lt; emitter.data.bursts[i].count; b++)
+      <span class="tok-fn">SpawnParticle</span>(emitter);
+
+    state.cyclesFired++;
+    <span class="tok-kw">bool</span> infinite = emitter.data.bursts[i].cycles &lt; <span class="tok-num">0</span>;
+    <span class="tok-kw">if</span> (infinite || state.cyclesFired &lt; emitter.data.bursts[i].cycles)
+      state.nextFireTime += emitter.data.bursts[i].interval;
+    <span class="tok-kw">else</span>
+      state.nextFireTime = -<span class="tok-num">1.f</span>; <span class="tok-comment">// disarm</span>
+  }
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─ Step 6 — Collision + Decal Spawning ─ -->
+    <div class="dd-block reverse">
+      <div class="dd-text">
+        <span class="dd-step">Step 06 — PhysX Collision &amp; Decal Spawning</span>
+        <div class="dd-title">Per-Particle Raycasts with World Hit Response</div>
+        <p class="dd-desc">
+          When <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">collideWithWorld</code> is enabled, each particle's previous position is stored every frame. In <code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">Update</code>, a PhysX raycast fires from the previous position toward the current one along the exact travel delta — so fast-moving particles never tunnel through geometry. On a confirmed hit, two independent behaviours trigger: the particle can be force-expired (<code style="font-family:'Share Tech Mono',monospace;font-size:0.88em;color:var(--accent);">dieOnCollision</code>), and a TGO decal can be spawned at the hit world position with a configurable scale. The decal TGO is assigned by drag-dropping an asset directly onto the editor field.
+        </p>
+        <div class="dd-toggle-group">
+          <button class="dd-toggle-btn active" onclick="setMediaMode('tools-media-6','image',this)">
+            <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
+            Image
+          </button>
+          <button class="dd-toggle-btn" onclick="setMediaMode('tools-media-6','video',this)">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            Video
+          </button>
+          <button class="dd-toggle-btn" onclick="setMediaMode('tools-media-6','code',this)">
+            <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+            Code
+          </button>
+        </div>
+      </div>
+      <div class="dd-media-panel" id="tools-media-6">
+        <img src="Images/Particles/particle_step_collision.png" alt="Collision system">
+        <video src="Videos/Particles/collision_decal.mp4" muted loop playsinline></video>
+        <div class="dd-code-view">
+          <div class="dd-code-header">
+            <span class="dd-code-filename">ParticleEmitter.cpp — per-particle PhysX raycast</span>
+            <span class="dd-code-lang">C++</span>
+          </div>
+          <pre><code><span class="tok-kw">if</span> (emitter.data.collideWithWorld &amp;&amp; globalCurrentPxScene)
+{
+  <span class="tok-comment">// Ray from previous position to current position</span>
+  physx::PxVec3 origin = { prevPos.x, prevPos.y, prevPos.z };
+  physx::PxVec3 delta  = { pos.x - prevPos.x,
+                            pos.y - prevPos.y,
+                            pos.z - prevPos.z };
+  <span class="tok-kw">float</span> dist = sqrtf(delta.x*delta.x +
+                     delta.y*delta.y +
+                     delta.z*delta.z);
+
+  <span class="tok-kw">if</span> (dist &gt; <span class="tok-num">0.001f</span>)
+  {
+    physx::PxVec3 dir = { delta.x/dist,
+                          delta.y/dist,
+                          delta.z/dist };
+    physx::PxRaycastBuffer hit;
+
+    <span class="tok-kw">if</span> (globalCurrentPxScene-&gt;<span class="tok-fn">raycast</span>(origin, dir, dist, hit))
+    {
+      <span class="tok-comment">// Spawn decal TGO at world hit point</span>
+      <span class="tok-kw">if</span> (emitter.data.spawnDecalOnCollision &amp;&amp;
+          !emitter.data.collisionTgoName.<span class="tok-fn">IsEmpty</span>())
+      {
+        Vector3f hitPos = { hit.block.position.x,
+                            hit.block.position.y,
+                            hit.block.position.z };
+        Matrix4x4f spawnTM =
+          Matrix4x4f::<span class="tok-fn">CreateFromTranslation</span>(hitPos);
+        spawnTM.<span class="tok-fn">SetScale</span>(emitter.data.collisionTgoScale);
+        GameWorld::<span class="tok-fn">GetInstance</span>().<span class="tok-fn">LoadAssetToScene</span>(
+          emitter.data.collisionTgoName, spawnTM, <span class="tok-lit">true</span>);
+      }
+      <span class="tok-kw">if</span> (emitter.data.dieOnCollision)
+        vfx-&gt;<span class="tok-fn">ForceExpire</span>();
+    }
+  }
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─ Step 7 — Production Results ─ -->
+    <div class="dd-block">
+      <div class="dd-text">
+        <span class="dd-step">Step 07 — Production Results</span>
+        <div class="dd-title">Effects Built with the Tool In-Game</div>
+        <p class="dd-desc">
+          The system was used across both projects to author gameplay effects — ambient smoke and environmental atmosphere, magic ability trails and impacts, boss attack telegraphs and hit bursts, and ground decals from particle collisions. Because the full pipeline ran in-engine with live preview and shape debug overlays, effects could be tuned directly in real gameplay context rather than in isolation.
+        </p>
+        <div class="dd-toggle-group">
+          <button class="dd-toggle-btn active" onclick="setMediaMode('tools-media-7','image',this)">
+            <svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>
+            Image
+          </button>
+          <button class="dd-toggle-btn" onclick="setMediaMode('tools-media-7','video',this)">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            Video
+          </button>
+        </div>
+      </div>
+      <div class="dd-media-panel" id="tools-media-7">
+        <img src="Images/Particles/particle_overview.png" alt="In-game particle effects">
+        <video src="Videos/Particles/ingame_effects.mp4" muted loop playsinline></video>
+      </div>
+    </div>
+
+  </div><!-- /deep-dive -->
+
+  <!-- ── FEATURE SHOWCASE ───────────────────────────────────────────── -->
+  <div class="p-section">
+    <h2>Feature Showcase</h2>
+    <div class="tools-feature-grid">
+      <div class="tools-feature-tile" onclick="openToolsLightbox('Images/Particles/particle_step1.png')">
+        <img src="Images/Particles/particle_step1.png" alt="Sub-emitter panel">
+        <div class="tools-feature-caption">Sub-Emitter Architecture</div>
+      </div>
+      <div class="tools-feature-tile" onclick="openToolsLightbox('Images/Particles/particle_step2.png')">
+        <img src="Images/Particles/particle_step2.png" alt="Curve editor">
+        <div class="tools-feature-caption">Curve Editor — 9 Channels</div>
+      </div>
+      <div class="tools-feature-tile" onclick="openToolsLightbox('Images/Particles/particle_step3.png')">
+        <img src="Images/Particles/particle_step3.png" alt="Spawn shapes">
+        <div class="tools-feature-caption">7 Spawn Shapes</div>
+      </div>
+      <div class="tools-feature-tile" onclick="openToolsLightbox('Images/Particles/particle_step4.png')">
+        <img src="Images/Particles/particle_step4.png" alt="Shape debug wireframe">
+        <div class="tools-feature-caption">Live Shape Debug Overlay</div>
+      </div>
+      <div class="tools-feature-tile" onclick="openToolsLightbox('Images/Particles/particle_step5.png')">
+        <img src="Images/Particles/particle_step5.png" alt="Burst system">
+        <div class="tools-feature-caption">Burst System</div>
+      </div>
+      <div class="tools-feature-tile" onclick="openToolsLightbox('Images/Particles/particle_step_collision.png')">
+        <img src="Images/Particles/particle_step_collision.png" alt="Collision + decals">
+        <div class="tools-feature-caption">PhysX Collision + Decals</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /p-body -->
 
     <footer>&copy; 2026 Alexander Englesson &nbsp;·&nbsp; Game Programmer &nbsp;·&nbsp; Stockholm</footer>
   </div><!-- /hud-screen -->
@@ -931,14 +1103,15 @@ s.gridSize = std::<span class="tok-fn">round</span>(s.gridSize / <span class="to
       <div class="p-section">
         <h2>Overview</h2>
         <p>
-          I built a custom particle and VFX editor in C++ inside our engine pipeline, designed to let artists and designers create gameplay effects directly in-engine with immediate visual feedback. The tool supports over-lifetime control of particle behaviour through editable curves, making it possible to shape effects such as smoke, magic trails, bursts, environmental ambience, and boss attacks without hardcoding each effect.
-        </p>
+I built a fully custom particle and VFX editor in C++ inside our team's engine (TGE), designed for real production use alongside artists and designers. The system supports seven spawn shapes, nine over-lifetime curves (size, velocity XYZ, colour RGBA, rotation), a sub-emitter architecture, a configurable burst system, PhysX world collision with decal spawning, and a warmup system for pre-simulating effects before the scene starts. Every property round-trips through a JSON serialisation layer, and the editor renders live per-shape wireframe debug overlays directly into the viewport so emitter bounds are always visible while tuning.        </p>
       </div>
 
       <div class="p-section">
         <h2>My Role &amp; Responsibilities</h2>
         <p>
-          I designed and implemented the editor-side workflow as well as the runtime integration. My work included building the particle property UI, supporting curve-driven parameters, previewing effects live in the editor, connecting data to the runtime particle system, and wiring variables into pixel and vertex shaders. I also worked on debug visualisation so it was easy to understand how emitters behaved while tuning them.
+I designed and built the full system solo — the data architecture, the ImGui editor UI, the JSON serialisation layer, the runtime particle update loop, the PhysX collision integration, and the shader integration. I also wrote the DrawShapeDebug static function that renders shape-accurate wireframes into the editor viewport, and a custom Rodrigues rotation implementation to orient all spawn shapes to an arbitrary axis without gimbal lock.
+
+C++ ImGui Editor Particle Systems Curve Editor Sub-Emitters Burst System PhysX Collision Decal Spawning JSON Serialisation Shader Integration Debug Visualisation Custom Engine (TGE)
         </p>
         <div class="p-chips">
           <span class="chip">C++</span>
@@ -955,8 +1128,7 @@ s.gridSize = std::<span class="tok-fn">round</span>(s.gridSize / <span class="to
       <div class="p-section">
         <h2>Technical Highlights</h2>
         <p>
-          The most important part of the tool was creating a clean path between editor data and runtime behaviour. I built support for over-lifetime curves controlling values such as size, colour, velocity, and rotation, and made sure those values were interpreted consistently both in the editor preview and in-game. I also focused on iteration speed — small changes to emitters could be seen immediately, which made the tool far more useful for real production work.
-        </p>
+The data layer uses a CopyOnWriteWrapper<ParticleEmitterData> — the editor holds a read-only view and only allocates a mutable copy the moment a field is changed, making the system safe for undo and sub-emitter nesting without defensive copying. Spawn shapes are oriented to any arbitrary axis using a custom Rodrigues rotation that avoids gimbal lock — the same helper runs in both the runtime emitter and the debug wireframe draw, keeping visual and actual spawn positions in perfect sync. The colour over-lifetime editor renders a live 50-segment gradient bar into the ImGui draw list by evaluating all four channel curves simultaneously, giving artists instant colour feedback before any particle is simulated.        </p>
       </div>
 
       <div class="deep-dive">
@@ -977,10 +1149,10 @@ s.gridSize = std::<span class="tok-fn">round</span>(s.gridSize / <span class="to
 
         <div class="dd-block reverse">
           <div class="dd-text">
-            <span class="dd-step">Step 02 — Curve Editing</span>
-            <div class="dd-title">Artist-Driven Over-Lifetime Behaviour</div>
+            <span class="dd-step">Step 02 — Over-Lifetime Curves</span>
+            <div class="dd-title">Nine Editable Curves with Live Colour Preview </div>
             <p class="dd-desc">
-              I added editable curves so effects could evolve naturally over time. Instead of hand-authoring each effect in code, artists could shape how particles changed from spawn to death by adjusting points directly in the editor.
+          Size, velocity (X/Y/Z), colour (R/G/B/A), and rotation are all curve-driven. The colour section evaluates all four channel curves simultaneously and renders a live 50-segment gradient bar directly into the ImGui draw list — so artists see the full colour transition instantly before any particle is spawned. Each velocity channel has its own sub-tab (X / Y / Z) with independent curve editing. All curve data flows through to the pixel and vertex shaders at runtime, keeping editor preview and in-game output in sync.            </p>
             </p>
           </div>
           <div class="dd-media-panel">
@@ -990,12 +1162,10 @@ s.gridSize = std::<span class="tok-fn">round</span>(s.gridSize / <span class="to
 
         <div class="dd-block">
           <div class="dd-text">
-            <span class="dd-step">Step 03 — Runtime Preview</span>
-            <div class="dd-title">Immediate In-Editor Feedback</div>
+            <span class="dd-step">Step 03 — Spawn Shapes</span>
+            <div class="dd-title">Seven Shapes Oriented via Rodrigues Rotation</div>
             <p class="dd-desc">
-              The tool supported live preview so changes could be evaluated instantly. That dramatically improved iteration speed and made it much easier to tune values like emission shape, burst feel, lifetime balance, and overall readability.
-            </p>
-          </div>
+The system supports Point, Sphere, Hollow Sphere, Cone, Box, Circle, and Edge. Every shape except Point is oriented to an arbitrary spawnDirection vector using a custom Rodrigues rotation — a compact formula that rotates any local-space vector onto a target axis in a single pass, with explicit edge-case handling for parallel and anti-parallel inputs. The same RotateOntoAxis lambda runs inside both CalculateParticleSpawn and DrawShapeDebug, so the debug wireframe always matches the actual spawn volume exactly.          </div>
           <div class="dd-media-panel">
             <img src="Images/Particles/particle_step3.png" alt="Live preview">
           </div>
